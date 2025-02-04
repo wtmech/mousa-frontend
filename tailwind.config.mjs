@@ -1,17 +1,31 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+const config = {
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,jsx}",
+    "./src/components/**/*.{js,jsx}",
   ],
   theme: {
     extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+      fontFamily: {
+        calistoga: ['var(--font-calistoga)'],
+        poppins: ['var(--font-poppins)'],
+        inter: ['var(--font-inter)'],
       },
+      colors: {
+        mousa: '#0D5EAF',
+        dark: {
+          main: '#0A0A0B',    // Main background (darkest)
+          sidebar: '#0F0F11', // Sidebar background (darker)
+          header: '#121214',  // Header background (lighter)
+          player: '#18181B',  // Player background (lightest)
+        }
+      }
     },
   },
-  plugins: [],
-};
+  plugins: [require("daisyui")],
+  daisyui: {
+    themes: ["dark", "light"],
+  },
+}
+
+export default config
