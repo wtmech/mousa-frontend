@@ -1,41 +1,47 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useImperativeHandle, forwardRef, useCallback } from 'react'
 import PlaylistItem from './PlaylistItem'
 import FolderItem from './FolderItem'
 import { fetchPlaylists, fetchFolders } from '@/services/api'
 import useAuthStore from '@/stores/authStore'
 
-export default function LibrarySection({ isMinimized }) {
+const LibrarySection = forwardRef(({ isMinimized }, ref) => {
   const [playlists, setPlaylists] = useState([])
   const [folders, setFolders] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
 
-  useEffect(() => {
-    async function loadLibrary() {
-      if (!isAuthenticated) return
+  const refresh = useCallback(async () => {
+    if (!isAuthenticated) return
 
-      try {
-        setIsLoading(true)
-        const [playlistsData, foldersData] = await Promise.all([
-          fetchPlaylists(),
-          fetchFolders()
-        ])
-        setPlaylists(playlistsData)
-        setFolders(foldersData)
-      } catch (err) {
-        setError(err.message)
-      } finally {
-        setIsLoading(false)
-      }
+    try {
+      setLoading(true)
+      const [playlistsData, foldersData] = await Promise.all([
+        fetchPlaylists(),
+        fetchFolders()
+      ])
+      setPlaylists(playlistsData)
+      setFolders(foldersData)
+      setError(null)
+    } catch (err) {
+      setError(err.message)
+      console.error('Failed to refresh playlists:', err)
+    } finally {
+      setLoading(false)
     }
-
-    loadLibrary()
   }, [isAuthenticated])
 
-  if (isLoading) {
+  useImperativeHandle(ref, () => ({
+    refresh
+  }))
+
+  useEffect(() => {
+    refresh()
+  }, [refresh])
+
+  if (loading) {
     return (
       <div className="space-y-2">
         {[...Array(4)].map((_, i) => (
@@ -58,9 +64,20 @@ export default function LibrarySection({ isMinimized }) {
 
   return (
     <div className="space-y-2">
-      {/* Root level playlists */}
+      {/* Liked Songs playlist always at top */}
       {playlists
-        .filter(playlist => !playlist.folder)
+        .filter(playlist => playlist.isSystem)
+        .map((playlist) => (
+          <PlaylistItem
+            key={playlist._id}
+            playlist={playlist}
+            isMinimized={isMinimized}
+          />
+        ))}
+
+      {/* Regular playlists */}
+      {playlists
+        .filter(playlist => !playlist.isSystem && !playlist.folder)
         .map((playlist) => (
           <PlaylistItem
             key={playlist._id}
@@ -79,4 +96,8 @@ export default function LibrarySection({ isMinimized }) {
       ))}
     </div>
   )
-}
+})
+
+LibrarySection.displayName = 'LibrarySection'
+
+export default LibrarySection

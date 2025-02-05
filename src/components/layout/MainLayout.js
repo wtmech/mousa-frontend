@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import Player from '../features/player/Player'
@@ -9,10 +9,14 @@ import useAuthStore from '@/stores/authStore'
 
 export default function MainLayout({ children }) {
   const { isAuthenticated, initializeAuth } = useAuthStore()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     initializeAuth()
+    setMounted(true)
   }, [initializeAuth])
+
+  if (!mounted) return null
 
   if (!isAuthenticated) {
     return <LoginPage />

@@ -1,34 +1,43 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  PlusIcon,
-  FolderPlusIcon,
-  QueueListIcon,
-  RssIcon,
-  GlobeAltIcon,
-  UsersIcon,
-  MusicalNoteIcon,
-  ComputerDesktopIcon
-} from '@heroicons/react/24/outline'
-import LibrarySection from '../features/library/LibrarySection'
 import Link from 'next/link'
+import {
+  RssSimple,
+  Globe,
+  Users,
+  MusicNote,
+  Desktop,
+  Plus,
+  Queue,
+  FolderSimplePlus,
+  CaretLeft,
+  CaretRight
+} from '@phosphor-icons/react'
+import CreatePlaylistModal from '../features/playlists/CreatePlaylistModal'
+import LibrarySection from '../features/library/LibrarySection'
+import { createPlaylist } from '@/services/api'
 
 const NAV_ITEMS = [
-  { icon: RssIcon, label: 'Feed', href: '/' },
-  { icon: GlobeAltIcon, label: 'Explore', href: '/explore' },
-  { icon: UsersIcon, label: 'Artists', href: '/artists' },
-  { icon: MusicalNoteIcon, label: 'Albums', href: '/albums' },
-  { icon: ComputerDesktopIcon, label: 'Local', href: '/local' },
+  { icon: RssSimple, label: 'Feed', href: '/' },
+  { icon: Globe, label: 'Explore', href: '/explore' },
+  { icon: Users, label: 'Artists', href: '/artists' },
+  { icon: MusicNote, label: 'Albums', href: '/albums' },
+  { icon: Desktop, label: 'Local', href: '/local' },
 ]
 
 export default function Sidebar() {
   const [isMinimized, setIsMinimized] = useState(false)
   const [showText, setShowText] = useState(true)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const dropdownRef = useRef(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const libraryRef = useRef(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleToggle = () => {
     if (!isMinimized) {
@@ -52,6 +61,30 @@ export default function Sidebar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const handleCreatePlaylist = async (playlistData) => {
+    try {
+      // Validate data
+      if (!playlistData?.name?.trim()) {
+        throw new Error('Playlist name is required');
+      }
+
+      // Create playlist
+      await createPlaylist(playlistData);
+
+      // Close modal first
+      setShowCreateModal(false);
+
+      // Then refresh library
+      if (libraryRef.current) {
+        await libraryRef.current.refresh();
+      }
+    } catch (error) {
+      // Optionally show error to user
+    }
+  };
+
+  if (!mounted) return null
+
   return (
     <div className={`${isMinimized ? 'w-20' : 'w-64'} bg-dark-sidebar min-h-screen ${isMinimized ? 'px-5' : 'px-6 pb-6'} transition-all duration-150 flex flex-col`}>
       {/* Logo and Toggle */}
@@ -72,9 +105,9 @@ export default function Sidebar() {
           title={isMinimized ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           {isMinimized ? (
-            <ChevronRightIcon className="h-4 w-4" />
+            <CaretRight className="h-5 w-5" />
           ) : (
-            <ChevronLeftIcon className="h-4 w-4" />
+            <CaretLeft className="h-5 w-5" />
           )}
         </button>
       </div>
@@ -103,26 +136,30 @@ export default function Sidebar() {
       {/* Playlists Section */}
       {!isMinimized && <h2 className="text-xs font-semibold mb-3 uppercase tracking-wider">Playlists</h2>}
 
+      {/* Create Button & Dropdown */}
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowDropdown(!showDropdown)}
           className="flex items-center space-x-2 py-1.5 px-2 hover:text-mousa hover:bg-white/[0.05] rounded-lg mb-3 w-full"
           title="Create New"
         >
-          <PlusIcon className="h-4 w-4 flex-shrink-0" />
+          <Plus className="h-5 w-5 flex-shrink-0" />
           {!isMinimized && <span className="text-sm">Create</span>}
         </button>
 
-        {showDropdown && !isMinimized && (
-          <div className="absolute left-0 mt-1 w-48 bg-dark-player rounded-md shadow-lg py-1 z-10 border border-white/[0.05]">
+        {showDropdown && (
+          <div className={`absolute mt-1 bg-dark-player rounded-md shadow-lg py-1 z-10 border border-white/[0.05] ${
+            isMinimized ? 'left-full ml-2' : 'left-0'
+          } w-48`}>
             <button
               className="w-full px-4 py-2 text-xs hover:bg-white/[0.05] flex items-center space-x-2"
               onClick={() => {
                 setShowDropdown(false)
+                setShowCreateModal(true)
               }}
               title="Create New Playlist"
             >
-              <QueueListIcon className="h-4 w-4" />
+              <Queue className="h-5 w-5" weight="bold" />
               <span>Create Playlist</span>
             </button>
             <button
@@ -132,14 +169,20 @@ export default function Sidebar() {
               }}
               title="Create New Folder"
             >
-              <FolderPlusIcon className="h-4 w-4" />
+              <FolderSimplePlus className="h-5 w-5" weight="bold" />
               <span>Create Folder</span>
             </button>
           </div>
         )}
       </div>
 
-      <LibrarySection isMinimized={isMinimized} />
+      <LibrarySection ref={libraryRef} isMinimized={isMinimized} />
+
+      <CreatePlaylistModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={handleCreatePlaylist}
+      />
     </div>
   )
 }

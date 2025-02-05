@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { BellIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { MagnifyingGlass, Bell } from '@phosphor-icons/react'
 
 export default function Header() {
   return (
@@ -9,7 +9,7 @@ export default function Header() {
       {/* Left Section: Search Bar */}
       <div className="flex items-center space-x-4">
         <div className="relative w-80">
-          <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <MagnifyingGlass className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" weight="bold" />
           <input
             type="text"
             placeholder="Search..."
@@ -21,7 +21,7 @@ export default function Header() {
       {/* Right Section */}
       <div className="flex items-center space-x-4">
         <button className="hover:text-mousa" title="Notifications">
-          <BellIcon className="h-6 w-6" />
+          <Bell className="h-6 w-6" weight="bold" />
         </button>
         <div className="w-8 h-8 rounded-full bg-mousa" title="Your Profile"></div>
       </div>

@@ -2,16 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import {
-  HeartIcon,
-  ArrowPathIcon,
-  BackwardIcon,
-  ForwardIcon,
-  PlayIcon,
-  PauseIcon,
-  ArrowsRightLeftIcon,
-  SpeakerWaveIcon,
-  SpeakerXMarkIcon
-} from '@heroicons/react/24/solid'
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Shuffle,
+  ArrowsClockwise,
+  Queue,
+  SpeakerHigh,
+  SpeakerLow,
+  SpeakerX,
+  Heart
+} from '@phosphor-icons/react'
 import { fetchTrack } from '@/services/api'
 import Image from 'next/image'
 
@@ -25,6 +27,8 @@ export default function Player() {
   const [track, setTrack] = useState(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [isLiked, setIsLiked] = useState(false)
 
   useEffect(() => {
     async function loadTrack() {
@@ -49,6 +53,48 @@ export default function Player() {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  const handleScrub = (e) => {
+    const scrubber = e.currentTarget
+    const rect = scrubber.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const percent = (x / rect.width) * 100
+    const newProgress = Math.min(Math.max(percent, 0), 100)
+
+    setProgress(newProgress)
+    setCurrentTime((duration * newProgress) / 100)
+  }
+
+  const handleDragStart = () => {
+    setIsDragging(true)
+  }
+
+  const handleDragEnd = () => {
+    setIsDragging(false)
+  }
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleDrag = (e) => {
+      const scrubber = document.querySelector('.progress-bar')
+      const rect = scrubber.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const percent = (x / rect.width) * 100
+      const newProgress = Math.min(Math.max(percent, 0), 100)
+
+      setProgress(newProgress)
+      setCurrentTime((duration * newProgress) / 100)
+    }
+
+    document.addEventListener('mousemove', handleDrag)
+    document.addEventListener('mouseup', handleDragEnd)
+
+    return () => {
+      document.removeEventListener('mousemove', handleDrag)
+      document.removeEventListener('mouseup', handleDragEnd)
+    }
+  }, [isDragging, duration])
+
   return (
     <div className="bg-dark-player border-t border-white/[0.05]">
       {/* Progress bar with times */}
@@ -57,12 +103,18 @@ export default function Player() {
           <span className="text-xs text-gray-400 w-12 text-right">
             {formatTime(currentTime)}
           </span>
-          <div className="h-1 bg-dark-header flex-1 group cursor-pointer">
-            <div
-              className="h-full bg-mousa relative group-hover:bg-mousa/90"
-              style={{ width: `${progress}%` }}
-            >
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100" />
+          <div
+            className="h-6 bg-transparent flex-1 group cursor-pointer progress-bar flex items-center"
+            onClick={handleScrub}
+            onMouseDown={() => setIsDragging(true)}
+          >
+            <div className="h-1 bg-white/10 w-full relative">
+              <div
+                className="h-full bg-mousa relative group-hover:bg-mousa/90"
+                style={{ width: `${progress}%` }}
+              >
+                <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-full ${isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+              </div>
             </div>
           </div>
           <span className="text-xs text-gray-400 w-12">
@@ -94,52 +146,55 @@ export default function Player() {
               {track?.artist?.name || 'Unknown artist'}
             </div>
           </div>
+          <button
+            onClick={() => setIsLiked(!isLiked)}
+            className={`ml-4 ${isLiked ? 'text-mousa' : 'text-gray-400 hover:text-white'}`}
+          >
+            <Heart className="h-5 w-5" weight={isLiked ? "fill" : "regular"} />
+          </button>
         </div>
 
         {/* Playback controls */}
-        <div className="flex flex-col items-center">
-          <div className="flex items-center space-x-4">
-            <button
-              className={`p-2 hover:text-mousa ${isShuffled ? 'text-mousa' : ''}`}
-              onClick={() => setIsShuffled(!isShuffled)}
-            >
-              <ArrowsRightLeftIcon className="h-4 w-4" />
-            </button>
-            <button className="p-2 hover:text-mousa">
-              <BackwardIcon className="h-5 w-5" />
-            </button>
-            <button
-              className="p-2 rounded-full bg-white hover:bg-white/90"
-              onClick={() => setIsPlaying(!isPlaying)}
-            >
-              {isPlaying ? (
-                <PauseIcon className="h-5 w-5 text-black" />
-              ) : (
-                <PlayIcon className="h-5 w-5 text-black" />
-              )}
-            </button>
-            <button className="p-2 hover:text-mousa">
-              <ForwardIcon className="h-5 w-5" />
-            </button>
-            <button
-              className={`p-2 hover:text-mousa ${repeatMode > 0 ? 'text-mousa' : ''}`}
-              onClick={() => setRepeatMode((repeatMode + 1) % 3)}
-            >
-              <ArrowPathIcon className="h-4 w-4" />
-            </button>
-          </div>
+        <div className="flex items-center gap-4">
+          <button className="text-gray-400 hover:text-white">
+            <Shuffle className="h-5 w-5" weight="bold" />
+          </button>
+          <button className="text-gray-400 hover:text-white">
+            <SkipBack className="h-5 w-5" weight="fill" />
+          </button>
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-black hover:scale-105"
+          >
+            {isPlaying ? (
+              <Pause className="h-5 w-5" weight="fill" />
+            ) : (
+              <Play className="h-5 w-5 ml-0.5" weight="fill" />
+            )}
+          </button>
+          <button className="text-gray-400 hover:text-white">
+            <SkipForward className="h-5 w-5" weight="fill" />
+          </button>
+          <button className="text-gray-400 hover:text-white">
+            <ArrowsClockwise className="h-5 w-5" weight="bold" />
+          </button>
         </div>
 
         {/* Volume control */}
-        <div className="w-1/4 flex items-center justify-end space-x-2">
+        <div className="flex items-center justify-end space-x-4 w-1/4">
+          <button className="text-gray-400 hover:text-white">
+            <Queue className="h-5 w-5" weight="bold" />
+          </button>
           <button
-            className="p-2 hover:text-mousa"
             onClick={() => setIsMuted(!isMuted)}
+            className="text-gray-400 hover:text-white"
           >
-            {isMuted ? (
-              <SpeakerXMarkIcon className="h-5 w-5" />
+            {isMuted || volume === 0 ? (
+              <SpeakerX className="h-5 w-5" weight="fill" />
+            ) : volume < 0.5 ? (
+              <SpeakerLow className="h-5 w-5" weight="fill" />
             ) : (
-              <SpeakerWaveIcon className="h-5 w-5" />
+              <SpeakerHigh className="h-5 w-5" weight="fill" />
             )}
           </button>
           <div className="w-24 h-1 bg-dark-header rounded-full cursor-pointer">

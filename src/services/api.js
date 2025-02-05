@@ -21,20 +21,39 @@ export async function fetchPlaylists() {
   }
 }
 
-export async function createPlaylist(name) {
+export const createPlaylist = async (playlistData) => {
   try {
+    // Validate input
+    if (!playlistData || typeof playlistData !== 'object') {
+      throw new Error('Invalid playlist data format');
+    }
+
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+
+    // previewImage is already base64, so we can send it directly
     const response = await fetch(`${API_BASE_URL}/playlists`, {
       method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({ name })
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(playlistData)  // includes previewImage in base64
     });
-    if (!response.ok) throw new Error('Failed to create playlist');
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Server error: ${response.status}`);
+    }
+
     return await response.json();
   } catch (error) {
-    console.error('Error creating playlist:', error);
+    console.error('Failed to create playlist:', error);
     throw error;
   }
-}
+};
 
 export async function login(credentials) {
   try {
