@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles with CSS variables */
+:root {
+  --primary: #9D4EDD;
+  --primary-hover: #8631D9;
+  --teal: #20B2AA;
+  --teal-hover: #1A8F89;
+  --gold: #E6C200;
+  --gold-hover: #BFA000;
+  --sage: #A7C4A0;
+  --sage-hover: #8FB286;
+  --error: #E57373;
+
+  /* Light mode */
+  --bg-primary: #F8F8F8;
+  --bg-surface: #FFFFFF;
+  --text-primary: #121212;
+  --text-secondary: #6B7280;
+  --border-color: #E5E7EB;
+}
+
+.dark {
+  --primary: #9D4EDD;
+  --primary-hover: #8631D9;
+  --teal: #20B2AA;
+  --teal-hover: #1A8F89;
+  --gold: #E6C200;
+  --gold-hover: #BFA000;
+  --sage: #A7C4A0;
+  --sage-hover: #8FB286;
+  --error: #E57373;
+
+  /* Dark mode */
+  --bg-primary: #121212;
+  --bg-surface: #1E1E1E;
+  --text-primary: #F8F8F8;
+  --text-secondary: #A0AEC0;
+  --border-color: #2D3748;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-brand;
+  }
+
+  /* Custom scrollbar styling */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-light-surface dark:bg-dark-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-teal/50 rounded-full hover:bg-teal/80 transition-colors;
+  }
+}
+
+@layer utilities {
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
