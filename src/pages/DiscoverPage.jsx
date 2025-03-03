@@ -73,18 +73,18 @@ const DiscoverPage = () => {
 
       {/* For You */}
       <section className="mb-8">
-        <div className="flex items-center mb-4">
-          <MdExplore className="mr-2 text-primary text-xl" />
+        <div className="flex items-center mb-3">
+          <MdExplore className="mr-2 text-primary text-lg" />
           <h2 className="text-xl font-semibold">For You</h2>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-2">
           {forYou.map(item => (
-            <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer">
-              <div className="w-full aspect-square bg-primary/20 dark:bg-primary/30 rounded-lg mb-2 flex items-center justify-center">
-                <HiMusicNote className="w-12 h-12 text-primary opacity-70" />
+            <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer">
+              <div className="w-full aspect-square bg-primary/20 dark:bg-primary/30 rounded-lg mb-1 flex items-center justify-center">
+                <HiMusicNote className="w-8 h-8 text-primary opacity-70" />
               </div>
-              <h3 className="font-semibold">{item.title}</h3>
-              <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">{item.artist}</p>
+              <h3 className="font-semibold text-xs truncate">{item.title}</h3>
+              <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary truncate">{item.artist}</p>
             </div>
           ))}
         </div>
@@ -92,18 +92,18 @@ const DiscoverPage = () => {
 
       {/* New Releases */}
       <section className="mb-8">
-        <div className="flex items-center mb-4">
-          <MdAlbum className="mr-2 text-teal text-xl" />
+        <div className="flex items-center mb-3">
+          <MdAlbum className="mr-2 text-teal text-lg" />
           <h2 className="text-xl font-semibold">New Releases</h2>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-2">
           {newReleases.map(item => (
-            <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer">
-              <div className="w-full aspect-square bg-teal/20 dark:bg-teal/30 rounded-lg mb-2 flex items-center justify-center">
-                <FaCompactDisc className="w-12 h-12 text-teal opacity-70" />
+            <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer">
+              <div className="w-full aspect-square bg-teal/20 dark:bg-teal/30 rounded-lg mb-1 flex items-center justify-center">
+                <FaCompactDisc className="w-8 h-8 text-teal opacity-70" />
               </div>
-              <h3 className="font-semibold">{item.title}</h3>
-              <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">{item.artist}</p>
+              <h3 className="font-semibold text-xs truncate">{item.title}</h3>
+              <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary truncate">{item.artist}</p>
               <p className="text-xs mt-1 text-teal">Released: {item.releaseDate}</p>
             </div>
           ))}
@@ -112,24 +112,24 @@ const DiscoverPage = () => {
 
       {/* Supported Artists Updates */}
       <section className="mb-8">
-        <div className="flex items-center mb-4">
-          <FaGuitar className="mr-2 text-primary text-xl" />
+        <div className="flex items-center mb-3">
+          <FaGuitar className="mr-2 text-primary text-lg" />
           <h2 className="text-xl font-semibold">Supported Artists Updates</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {artistUpdates.map(item => (
-            <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex">
-              <div className="w-12 h-12 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center mr-3">
-                <FaGuitar className="text-primary" />
+            <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex">
+              <div className="w-8 h-8 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center mr-2">
+                <FaGuitar className="text-primary text-xs" />
               </div>
               <div>
-                <h3 className="font-semibold">{item.artist}</h3>
-                <p className="text-sm">{item.title}</p>
+                <h3 className="font-semibold text-xs">{item.artist}</h3>
+                <p className="text-xs">{item.title}</p>
                 <div className="flex mt-1 items-center">
                   {item.type === 'exclusive' && (
-                    <span className="text-xs bg-gold/20 text-gold px-2 py-0.5 rounded-full">Exclusive</span>
+                    <span className="text-xs bg-gold/20 text-gold px-1 py-0.5 rounded-full text-[10px]">Exclusive</span>
                   )}
-                  <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary ml-2">{item.date}</span>
+                  <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary ml-1 text-[10px]">{item.date}</span>
                 </div>
               </div>
             </div>
@@ -138,24 +138,24 @@ const DiscoverPage = () => {
       </section>
 
       {/* Two-column layout for Trending and Mousa Originals */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         {/* Trending */}
         <section>
-          <div className="flex items-center mb-4">
-            <MdTrendingUp className="mr-2 text-sage text-xl" />
+          <div className="flex items-center mb-3">
+            <MdTrendingUp className="mr-2 text-sage text-lg" />
             <h2 className="text-xl font-semibold">Trending</h2>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {trending.map(item => (
-              <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-3 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex items-center">
-                <div className="w-10 h-10 rounded-md bg-sage/20 dark:bg-sage/30 flex items-center justify-center mr-3">
-                  <HiFire className="text-sage" />
+              <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex items-center">
+                <div className="w-8 h-8 rounded-md bg-sage/20 dark:bg-sage/30 flex items-center justify-center mr-2">
+                  <HiFire className="text-sage text-xs" />
                 </div>
                 <div className="flex-grow">
-                  <h3 className="font-medium text-sm">{item.title}</h3>
-                  <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">{item.artist}</p>
+                  <h3 className="font-medium text-xs">{item.title}</h3>
+                  <p className="text-[10px] text-light-text-secondary dark:text-dark-text-secondary">{item.artist}</p>
                 </div>
-                <span className="text-xs text-sage">{(item.plays / 1000000).toFixed(1)}M plays</span>
+                <span className="text-[10px] text-sage">{(item.plays / 1000000).toFixed(1)}M plays</span>
               </div>
             ))}
           </div>
@@ -163,20 +163,20 @@ const DiscoverPage = () => {
 
         {/* Mousa Originals */}
         <section>
-          <div className="flex items-center mb-4">
-            <BsLightningFill className="mr-2 text-teal text-xl" />
+          <div className="flex items-center mb-3">
+            <BsLightningFill className="mr-2 text-teal text-lg" />
             <h2 className="text-xl font-semibold">Mousa Originals</h2>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {originals.map(item => (
-              <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-3 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex items-center">
-                <div className="w-16 h-16 rounded-md bg-teal/20 dark:bg-teal/30 flex items-center justify-center mr-3">
-                  <BsLightningFill className="text-teal text-xl" />
+              <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex items-center">
+                <div className="w-10 h-10 rounded-md bg-teal/20 dark:bg-teal/30 flex items-center justify-center mr-2">
+                  <BsLightningFill className="text-teal text-sm" />
                 </div>
                 <div>
-                  <h3 className="font-medium">{item.title}</h3>
-                  <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">{item.description}</p>
-                  <span className="text-xs bg-teal/20 text-teal px-2 py-0.5 rounded-full mt-1 inline-block">Mousa Exclusive</span>
+                  <h3 className="font-medium text-xs">{item.title}</h3>
+                  <p className="text-[10px] text-light-text-secondary dark:text-dark-text-secondary">{item.description}</p>
+                  <span className="text-[10px] bg-teal/20 text-teal px-1 py-0.5 rounded-full mt-1 inline-block">Mousa Exclusive</span>
                 </div>
               </div>
             ))}
@@ -186,18 +186,18 @@ const DiscoverPage = () => {
 
       {/* Genres & Moods */}
       <section className="mb-8">
-        <div className="flex items-center mb-4">
-          <FaHeadphones className="mr-2 text-primary text-xl" />
+        <div className="flex items-center mb-3">
+          <FaHeadphones className="mr-2 text-primary text-lg" />
           <h2 className="text-xl font-semibold">Genres & Moods</h2>
         </div>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+        <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-2">
           {genres.map(genre => (
             <div
               key={genre.id}
-              className="bg-light-surface dark:bg-dark-surface rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex flex-col items-center justify-center p-4 aspect-square"
+              className="bg-light-surface dark:bg-dark-surface rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex flex-col items-center justify-center p-2 aspect-square"
             >
-              <span className="text-2xl mb-2">{genre.icon}</span>
-              <span className="font-medium text-sm">{genre.name}</span>
+              <span className="text-lg mb-1">{genre.icon}</span>
+              <span className="font-medium text-xs">{genre.name}</span>
             </div>
           ))}
         </div>
@@ -205,33 +205,33 @@ const DiscoverPage = () => {
 
       {/* Featured Campaigns */}
       <section className="mb-8">
-        <div className="flex items-center mb-4">
-          <MdFeaturedPlayList className="mr-2 text-gold text-xl" />
+        <div className="flex items-center mb-3">
+          <MdFeaturedPlayList className="mr-2 text-gold text-lg" />
           <h2 className="text-xl font-semibold">Featured Campaigns</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {campaigns.map(campaign => (
-            <div key={campaign.id} className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg transition">
-              <div className="flex items-center mb-2">
-                <div className="w-10 h-10 rounded-full bg-gold/20 dark:bg-gold/30 flex items-center justify-center mr-3">
-                  <FaGuitar className="text-gold" />
+            <div key={campaign.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg transition">
+              <div className="flex items-center mb-1">
+                <div className="w-8 h-8 rounded-full bg-gold/20 dark:bg-gold/30 flex items-center justify-center mr-2">
+                  <FaGuitar className="text-gold text-xs" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">{campaign.artist}</h3>
-                  <p className="text-sm">{campaign.title}</p>
+                  <h3 className="font-semibold text-xs">{campaign.artist}</h3>
+                  <p className="text-xs">{campaign.title}</p>
                 </div>
               </div>
-              <div className="w-full bg-light-bg dark:bg-dark-bg rounded-full h-3 mb-1">
+              <div className="w-full bg-light-bg dark:bg-dark-bg rounded-full h-2 mb-1">
                 <div
-                  className="bg-gold h-3 rounded-full"
+                  className="bg-gold h-2 rounded-full"
                   style={{ width: `${(campaign.current / campaign.goal) * 100}%` }}
                 ></div>
               </div>
-              <div className="flex justify-between text-xs text-light-text-secondary dark:text-dark-text-secondary">
+              <div className="flex justify-between text-[10px] text-light-text-secondary dark:text-dark-text-secondary">
                 <span>${campaign.current} raised</span>
                 <span>Goal: ${campaign.goal}</span>
               </div>
-              <button className="mt-3 w-full py-2 bg-gold hover:bg-gold-hover text-white rounded-md transition">Support</button>
+              <button className="mt-2 w-full py-1 bg-gold hover:bg-gold-hover text-white rounded-md transition text-xs">Support</button>
             </div>
           ))}
         </div>

@@ -162,14 +162,14 @@ const HomePage = () => {
           <button className="text-sm text-primary hover:underline">See All</button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
           {recentlyPlayed.map((item) => (
-            <div key={item.id} className="bg-light-bg dark:bg-dark-bg hover:bg-primary/5 dark:hover:bg-primary/10 rounded-md p-3 transition-colors cursor-pointer shadow-sm">
-              <div className="aspect-square bg-light-surface dark:bg-dark-surface rounded-md mb-3 flex items-center justify-center">
-                <BsMusicNote className="text-4xl text-teal" />
+            <div key={item.id} className="bg-light-bg dark:bg-dark-bg hover:bg-primary/5 dark:hover:bg-primary/10 rounded-md p-2 transition-colors cursor-pointer shadow-sm">
+              <div className="aspect-square bg-light-surface dark:bg-dark-surface rounded-md mb-2 flex items-center justify-center">
+                <BsMusicNote className="text-2xl text-teal" />
               </div>
-              <h3 className="font-medium truncate">{item.title}</h3>
-              <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary truncate">{item.artist}</p>
+              <h3 className="font-medium text-xs truncate">{item.title}</h3>
+              <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary truncate">{item.artist}</p>
             </div>
           ))}
         </div>
@@ -182,15 +182,15 @@ const HomePage = () => {
           <button className="text-sm text-primary hover:underline">Browse All</button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
           {featuredPlaylists.map((playlist) => (
-            <div key={playlist.id} className="bg-light-bg dark:bg-dark-bg hover:bg-primary/5 dark:hover:bg-primary/10 rounded-lg p-4 flex space-x-4 transition-colors cursor-pointer shadow-sm">
-              <div className="h-24 w-24 bg-light-surface dark:bg-dark-surface rounded-md flex items-center justify-center flex-shrink-0">
-                <MdLibraryMusic className="text-5xl text-primary" />
+            <div key={playlist.id} className="bg-light-bg dark:bg-dark-bg hover:bg-primary/5 dark:hover:bg-primary/10 rounded-lg p-2 flex flex-col transition-colors cursor-pointer shadow-sm">
+              <div className="h-12 w-12 bg-light-surface dark:bg-dark-surface rounded-md flex items-center justify-center flex-shrink-0 mx-auto mb-2">
+                <MdLibraryMusic className="text-xl text-primary" />
               </div>
-              <div className="flex flex-col justify-center">
-                <h3 className="font-medium">{playlist.title}</h3>
-                <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary line-clamp-2">{playlist.description}</p>
+              <div className="text-center overflow-hidden">
+                <h3 className="font-medium text-xs truncate">{playlist.title}</h3>
+                <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary line-clamp-1">{playlist.description}</p>
               </div>
             </div>
           ))}
