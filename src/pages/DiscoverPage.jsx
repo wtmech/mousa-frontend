@@ -1,18 +1,27 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { MdExplore, MdTrendingUp, MdAlbum, MdFeaturedPlayList } from 'react-icons/md';
 import { HiFire, HiMusicNote } from 'react-icons/hi';
 import { FaGuitar, FaHeadphones, FaCompactDisc } from 'react-icons/fa';
 import { BsLightningFill } from 'react-icons/bs';
+import MusicCard from '../components/ui/MusicCard';
+import HorizontalMusicCard from '../components/ui/HorizontalMusicCard';
+import SectionTitle from '../components/ui/SectionTitle';
+import PageTitle from '../components/ui/PageTitle';
+import { useTracks } from '../hooks/useMusic';
 
 const DiscoverPage = () => {
+  // Use real tracks from DB for trending section
+  const { data: tracksData, isLoading: tracksLoading, error: tracksError } = useTracks(1, 3);
+
   // State for each section's data
   const [forYou, setForYou] = useState([]);
   const [newReleases, setNewReleases] = useState([]);
   const [artistUpdates, setArtistUpdates] = useState([]);
-  const [trending, setTrending] = useState([]);
   const [originals, setOriginals] = useState([]);
   const [genres, setGenres] = useState([]);
-  const [recentlyPlayed, setRecentlyPlayed] = useState([]);
+  // Commenting out unused state variable to fix linter error
+  // const [recentlyPlayed, setRecentlyPlayed] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
 
   // Simulate fetching data
@@ -36,12 +45,6 @@ const DiscoverPage = () => {
       { id: 2, artist: 'The Echomakers', type: 'exclusive', title: 'Acoustic version of "Echo"', date: '2023-06-10' },
     ]);
 
-    setTrending([
-      { id: 1, title: 'Summer Anthem', artist: 'Beach Brigade', coverImage: null, plays: 1245000 },
-      { id: 2, title: 'Midnight Drive', artist: 'Neon Nova', coverImage: null, plays: 987000 },
-      { id: 3, title: 'Lost Time', artist: 'Chronos', coverImage: null, plays: 876000 },
-    ]);
-
     setOriginals([
       { id: 1, title: 'Mousa Sessions: Luna Ray', description: 'Live performance', coverImage: null },
       { id: 2, title: 'Rising Stars Playlist', description: 'Curated new talent', coverImage: null },
@@ -56,66 +59,72 @@ const DiscoverPage = () => {
       { id: 6, name: 'Workout', icon: '💪' },
     ]);
 
-    setRecentlyPlayed([
-      { id: 1, title: 'Dreamscape', artist: 'Luna Ray', lastPlayed: '1 hour ago', coverImage: null },
-      { id: 2, title: 'Echoes', artist: 'The Echomakers', lastPlayed: '3 hours ago', coverImage: null },
-    ]);
-
     setCampaigns([
       { id: 1, artist: 'Luna Ray', title: 'Studio Album Fundraiser', goal: 5000, current: 3750 },
       { id: 2, artist: 'The Echomakers', title: 'Tour Support', goal: 10000, current: 6200 },
     ]);
   }, []);
 
+  // Format plays for display
+  const formatPlays = (plays) => {
+    if (plays >= 1000000) {
+      return `${(plays / 1000000).toFixed(1)}M plays`;
+    } else if (plays >= 1000) {
+      return `${(plays / 1000).toFixed(1)}K plays`;
+    }
+    return `${plays} plays`;
+  };
+
   return (
     <div className="pb-24 pt-2">
-      <h1 className="text-3xl font-bold mb-6">Discover</h1>
+      <PageTitle>Discover</PageTitle>
 
       {/* For You */}
       <section className="mb-8">
-        <div className="flex items-center mb-3">
-          <MdExplore className="mr-2 text-primary text-lg" />
-          <h2 className="text-xl font-semibold">For You</h2>
-        </div>
+        <SectionTitle icon={<MdExplore className="text-primary" />}>
+          For You
+        </SectionTitle>
         <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-2">
           {forYou.map(item => (
-            <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer">
-              <div className="w-full aspect-square bg-primary/20 dark:bg-primary/30 rounded-lg mb-1 flex items-center justify-center">
-                <HiMusicNote className="w-8 h-8 text-primary opacity-70" />
-              </div>
-              <h3 className="font-semibold text-xs truncate">{item.title}</h3>
-              <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary truncate">{item.artist}</p>
-            </div>
+            <MusicCard
+              key={item.id}
+              title={item.title}
+              subtitle={item.artist}
+              icon={<HiMusicNote />}
+              bgColor="primary"
+              size="medium"
+              onClick={() => console.log(`Clicked on ${item.title}`)}
+            />
           ))}
         </div>
       </section>
 
       {/* New Releases */}
       <section className="mb-8">
-        <div className="flex items-center mb-3">
-          <MdAlbum className="mr-2 text-teal text-lg" />
-          <h2 className="text-xl font-semibold">New Releases</h2>
-        </div>
+        <SectionTitle icon={<MdAlbum className="text-teal" />}>
+          New Releases
+        </SectionTitle>
         <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-2">
           {newReleases.map(item => (
-            <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer">
-              <div className="w-full aspect-square bg-teal/20 dark:bg-teal/30 rounded-lg mb-1 flex items-center justify-center">
-                <FaCompactDisc className="w-8 h-8 text-teal opacity-70" />
-              </div>
-              <h3 className="font-semibold text-xs truncate">{item.title}</h3>
-              <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary truncate">{item.artist}</p>
-              <p className="text-xs mt-1 text-teal">Released: {item.releaseDate}</p>
-            </div>
+            <MusicCard
+              key={item.id}
+              title={item.title}
+              subtitle={item.artist}
+              icon={<FaCompactDisc />}
+              bgColor="teal"
+              releaseDate={item.releaseDate}
+              size="medium"
+              onClick={() => console.log(`Clicked on ${item.title}`)}
+            />
           ))}
         </div>
       </section>
 
       {/* Supported Artists Updates */}
       <section className="mb-8">
-        <div className="flex items-center mb-3">
-          <FaGuitar className="mr-2 text-primary text-lg" />
-          <h2 className="text-xl font-semibold">Supported Artists Updates</h2>
-        </div>
+        <SectionTitle icon={<FaGuitar className="text-primary" />}>
+          Supported Artists Updates
+        </SectionTitle>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {artistUpdates.map(item => (
             <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex">
@@ -123,7 +132,7 @@ const DiscoverPage = () => {
                 <FaGuitar className="text-primary text-xs" />
               </div>
               <div>
-                <h3 className="font-semibold text-xs">{item.artist}</h3>
+                <h3 className="font-sans font-semibold text-xs">{item.artist}</h3>
                 <p className="text-xs">{item.title}</p>
                 <div className="flex mt-1 items-center">
                   {item.type === 'exclusive' && (
@@ -141,44 +150,53 @@ const DiscoverPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         {/* Trending */}
         <section>
-          <div className="flex items-center mb-3">
-            <MdTrendingUp className="mr-2 text-sage text-lg" />
-            <h2 className="text-xl font-semibold">Trending</h2>
-          </div>
-          <div className="space-y-2">
-            {trending.map(item => (
-              <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex items-center">
-                <div className="w-8 h-8 rounded-md bg-sage/20 dark:bg-sage/30 flex items-center justify-center mr-2">
-                  <HiFire className="text-sage text-xs" />
-                </div>
-                <div className="flex-grow">
-                  <h3 className="font-medium text-xs">{item.title}</h3>
-                  <p className="text-[10px] text-light-text-secondary dark:text-dark-text-secondary">{item.artist}</p>
-                </div>
-                <span className="text-[10px] text-sage">{(item.plays / 1000000).toFixed(1)}M plays</span>
-              </div>
-            ))}
-          </div>
+          <SectionTitle icon={<MdTrendingUp className="text-sage" />}>
+            Trending
+          </SectionTitle>
+          {tracksLoading ? (
+            <div className="flex justify-center items-center h-24">
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-sage"></div>
+            </div>
+          ) : tracksError ? (
+            <div className="text-red-500 text-sm p-2">
+              Failed to load trending tracks
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {tracksData?.tracks.slice(0, 3).map((track) => (
+                <Link key={track._id} to={`/tracks/${track._id}`}>
+                  <HorizontalMusicCard
+                    title={track.title}
+                    subtitle={track.artist?.name || 'Unknown Artist'}
+                    icon={<HiFire />}
+                    bgColor="sage"
+                    coverImage={track.coverArt || track.album?.coverArt}
+                    rightText={formatPlays(track.plays || 0)}
+                    size="small"
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Mousa Originals */}
         <section>
-          <div className="flex items-center mb-3">
-            <BsLightningFill className="mr-2 text-teal text-lg" />
-            <h2 className="text-xl font-semibold">Mousa Originals</h2>
-          </div>
+          <SectionTitle icon={<BsLightningFill className="text-teal" />}>
+            Mousa Originals
+          </SectionTitle>
           <div className="space-y-2">
             {originals.map(item => (
-              <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex items-center">
-                <div className="w-10 h-10 rounded-md bg-teal/20 dark:bg-teal/30 flex items-center justify-center mr-2">
-                  <BsLightningFill className="text-teal text-sm" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-xs">{item.title}</h3>
-                  <p className="text-[10px] text-light-text-secondary dark:text-dark-text-secondary">{item.description}</p>
-                  <span className="text-[10px] bg-teal/20 text-teal px-1 py-0.5 rounded-full mt-1 inline-block">Mousa Exclusive</span>
-                </div>
-              </div>
+              <HorizontalMusicCard
+                key={item.id}
+                title={item.title}
+                subtitle={item.description}
+                icon={<BsLightningFill />}
+                bgColor="teal"
+                badgeText="Mousa Exclusive"
+                size="medium"
+                onClick={() => console.log(`Clicked on original item ${item.title}`)}
+              />
             ))}
           </div>
         </section>
@@ -186,29 +204,30 @@ const DiscoverPage = () => {
 
       {/* Genres & Moods */}
       <section className="mb-8">
-        <div className="flex items-center mb-3">
-          <FaHeadphones className="mr-2 text-primary text-lg" />
-          <h2 className="text-xl font-semibold">Genres & Moods</h2>
-        </div>
+        <SectionTitle icon={<FaHeadphones className="text-primary" />}>
+          Genres & Moods
+        </SectionTitle>
         <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-2">
           {genres.map(genre => (
-            <div
+            <MusicCard
               key={genre.id}
-              className="bg-light-surface dark:bg-dark-surface rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex flex-col items-center justify-center p-2 aspect-square"
-            >
-              <span className="text-lg mb-1">{genre.icon}</span>
-              <span className="font-medium text-xs">{genre.name}</span>
-            </div>
+              title={genre.name}
+              subtitle=""
+              icon={<span className="text-lg">{genre.icon}</span>}
+              bgColor="primary"
+              size="small"
+              centered={true}
+              onClick={() => console.log(`Clicked on genre ${genre.name}`)}
+            />
           ))}
         </div>
       </section>
 
       {/* Featured Campaigns */}
       <section className="mb-8">
-        <div className="flex items-center mb-3">
-          <MdFeaturedPlayList className="mr-2 text-gold text-lg" />
-          <h2 className="text-xl font-semibold">Featured Campaigns</h2>
-        </div>
+        <SectionTitle icon={<MdFeaturedPlayList className="text-gold" />}>
+          Featured Campaigns
+        </SectionTitle>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {campaigns.map(campaign => (
             <div key={campaign.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg transition">
@@ -217,7 +236,7 @@ const DiscoverPage = () => {
                   <FaGuitar className="text-gold text-xs" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-xs">{campaign.artist}</h3>
+                  <h3 className="font-sans font-semibold text-xs">{campaign.artist}</h3>
                   <p className="text-xs">{campaign.title}</p>
                 </div>
               </div>

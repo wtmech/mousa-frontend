@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { MdHistory, MdMusicNote, MdPlaylistPlay, MdDownload, MdAccessTime, MdDelete } from 'react-icons/md';
 import { FaLock, FaCalendarAlt } from 'react-icons/fa';
 import { HiClock } from 'react-icons/hi';
+import PageTitle from '../../components/ui/PageTitle';
 
 const HistoryPage = () => {
   // State for history data
@@ -53,7 +55,7 @@ const HistoryPage = () => {
 
   return (
     <div className="pb-24 pt-2">
-      <h1 className="text-3xl font-bold mb-2">History</h1>
+      <PageTitle>History</PageTitle>
       <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
         Your listening history and recent activity
       </p>
@@ -94,7 +96,14 @@ const HistoryPage = () => {
                     </div>
                     <div className="flex-grow">
                       <h3 className="font-medium text-sm">{item.title}</h3>
-                      <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">{item.artist}</p>
+                      <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
+                        <Link
+                          to={`/artists/${item.artistId}`}
+                          className="hover:text-teal transition-colors"
+                        >
+                          {item.artist}
+                        </Link>
+                      </p>
                     </div>
                     <div className="flex flex-col items-end">
                       <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary flex items-center">
@@ -141,7 +150,13 @@ const HistoryPage = () => {
                         <span className="font-medium">{activity.action}</span>
                       </p>
                       <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                        {activity.item} - {activity.artist}
+                        {activity.item} -
+                        <Link
+                          to={`/artists/${activity.artistId}`}
+                          className="hover:text-teal transition-colors"
+                        >
+                          {activity.artist}
+                        </Link>
                       </p>
                       <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary mt-1">
                         {activity.timestamp}

@@ -1,42 +1,204 @@
 import { useState, useEffect } from 'react';
-import { MdPlaylistPlay } from 'react-icons/md';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const PlaylistsPage = () => {
-  // State for playlists
-  const [playlists, setPlaylists] = useState([]);
+  const [library, setLibrary] = useState({
+    rootFolders: [],
+    unfolderedPlaylists: [],
+    likedPlaylist: [],
+    totalPlaylists: 0,
+    totalFolders: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Simulate fetching data
   useEffect(() => {
-    // Mock data for playlists
-    setPlaylists([
-      { id: 1, title: 'Morning Vibes', trackCount: 24, coverImage: null },
-      { id: 2, title: 'Workout Mix', trackCount: 18, coverImage: null },
-      { id: 3, title: 'Chill Evening', trackCount: 32, coverImage: null },
-      { id: 4, title: 'Focus Time', trackCount: 15, coverImage: null },
-      { id: 5, title: 'Dinner Party', trackCount: 22, coverImage: null },
-      { id: 6, title: 'Road Trip', trackCount: 40, coverImage: null },
-    ]);
+    const fetchLibrary = async () => {
+      try {
+        setIsLoading(true);
+        const token = localStorage.getItem('token');
+
+        const response = await axios.get('/api/users/me/library', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        setLibrary(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Error in fetch flow:', err);
+        setError('Failed to load your library. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLibrary();
   }, []);
 
-  return (
-    <div className="pb-24 pt-2">
-      <h1 className="text-3xl font-bold mb-6">Your Playlists</h1>
+  // Format duration from seconds to hours/minutes
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    if (mins < 60) {
+      return `${mins} min`;
+    }
+    const hours = Math.floor(mins / 60);
+    const remainingMins = mins % 60;
+    return `${hours} hr ${remainingMins} min`;
+  };
 
-      <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3">
-        {playlists.map(playlist => (
-          <div key={playlist.id} className="bg-light-surface dark:bg-dark-surface p-3 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer">
-            <div className="w-full aspect-square bg-primary/20 dark:bg-primary/30 rounded-lg mb-2 flex items-center justify-center">
-              <MdPlaylistPlay className="w-8 h-8 text-primary opacity-70" />
-            </div>
-            <h3 className="font-semibold text-sm truncate">{playlist.title}</h3>
-            <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">{playlist.trackCount} tracks</p>
-          </div>
-        ))}
-        {/* Create Playlist Button */}
-        <div className="bg-light-surface dark:bg-dark-surface p-3 rounded-lg border-2 border-dashed border-light-text-secondary dark:border-dark-text-secondary hover:border-primary dark:hover:border-primary transition cursor-pointer flex flex-col items-center justify-center">
-          <span className="text-2xl mb-1 text-light-text-secondary dark:text-dark-text-secondary">+</span>
-          <span className="font-medium text-sm text-light-text-secondary dark:text-dark-text-secondary">Create Playlist</span>
+  // Render a playlist card
+  const PlaylistCard = ({ playlist }) => {
+    if (!playlist) return null;
+
+    const cardStyle = {
+      backgroundColor: playlist.color || '#333'
+    };
+
+    return (
+      <Link
+        to={`/playlists/${playlist._id}`}
+        className="block rounded-md overflow-hidden hover:scale-105 transition-transform duration-200"
+      >
+        <div className="aspect-square bg-secondary flex items-center justify-center rounded-md overflow-hidden" style={cardStyle}>
+          {playlist.coverImage ? (
+            <img src={playlist.coverImage} alt={playlist.name || 'Playlist'} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-5xl">♪</span>
+          )}
         </div>
+        <div className="mt-2">
+          <h3 className="font-medium truncate">{playlist.name || 'Untitled Playlist'}</h3>
+          <p className="text-sm text-muted-foreground">
+            {formatDuration((playlist.stats?.totalDuration || 0))}
+          </p>
+        </div>
+      </Link>
+    );
+  };
+
+  // Render a folder with its playlists
+  const FolderSection = ({ folder, level = 0 }) => {
+    if (!folder) return null;
+
+    const folderPlaylists = folder.playlists || [];
+    const childFolders = folder.childFolders || [];
+
+    return (
+      <div className={`mb-6 ${level > 0 ? 'ml-6' : ''}`}>
+        <div className="flex items-center justify-between mb-3">
+          <Link
+            to={`/playlists/folders/${folder._id}`}
+            className="text-xl font-semibold hover:text-primary transition-colors flex items-center"
+          >
+            <span className="mr-2">Folder</span> {folder.name}
+          </Link>
+          <span className="text-sm text-muted-foreground">{folderPlaylists.length} playlists</span>
+        </div>
+
+        {folder.description && (
+          <p className="text-muted-foreground mb-4">{folder.description}</p>
+        )}
+
+        {folderPlaylists.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
+            {folderPlaylists.map(playlist => (
+              <PlaylistCard key={playlist._id} playlist={playlist} />
+            ))}
+          </div>
+        )}
+
+        {childFolders.length > 0 && (
+          <div className="border-l-2 border-secondary pl-4">
+            {childFolders.map(childFolder => (
+              <FolderSection key={childFolder._id} folder={childFolder} level={level + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Your Playlists</h1>
+
+        <div className="flex space-x-3">
+          <Link to="/playlists/create" className="btn btn-primary">
+            Create Playlist
+          </Link>
+          <Link to="/playlists/folders" className="btn btn-outline">
+            Manage Folders
+          </Link>
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-red-500/10 text-red-500 p-4 mb-6 rounded-md">
+          {error}
+        </div>
+      )}
+
+      <div className="mb-8">
+        <div className="text-xl font-semibold mb-4 flex items-center">
+          <span className="mr-2">Library</span> ({library.totalPlaylists || 0} playlists)
+        </div>
+
+        {/* Root Folders */}
+        {library.rootFolders?.map(folder => (
+          <FolderSection key={folder._id} folder={folder} />
+        ))}
+
+        {/* Unfiled Playlists */}
+        {library.unfolderedPlaylists?.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <span className="mr-2">Unfiled</span> Playlists
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+              {library.unfolderedPlaylists.map(playlist => (
+                <PlaylistCard key={playlist._id} playlist={playlist} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Liked Songs */}
+        {library.likedPlaylist?.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <span className="mr-2">Liked</span> Music
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+              {library.likedPlaylist.map(playlist => (
+                <div key={playlist._id || 'liked'} className="col-span-1">
+                  <Link
+                    to={`/playlists/${playlist._id}`}
+                    className="block rounded-md overflow-hidden hover:scale-105 transition-transform duration-200"
+                  >
+                    <div className="aspect-square bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center rounded-md">
+                      <span className="text-5xl">♥</span>
+                    </div>
+                    <div className="mt-2">
+                      <h3 className="font-medium">{playlist.name || 'Liked Music'}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDuration((playlist.stats?.totalDuration || 0))}
+                      </p>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { MdAudiotrack, MdPlaylistAdd, MdAlbum, MdPlaylistPlay, MdMusicNote, MdDo
 import { FaGuitar, FaUsers, FaCompactDisc, FaLock } from 'react-icons/fa';
 import { RiVipCrownFill } from 'react-icons/ri';
 import { useState, useEffect } from 'react';
+import Logo from './Logo';
 
 const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -30,7 +31,7 @@ const Sidebar = () => {
         { id: 'history', name: 'History', path: '/collection/history', icon: <MdHistory className="w-4 h-4" /> },
       ]
     },
-    { id: 3, name: 'Artist Hub', path: '/artist-hub', icon: <FaGuitar className="w-5 h-5" /> },
+    { id: 3, name: 'Feed', path: '/feed', icon: <HiRss className="w-5 h-5" /> },
   ];
 
   // Toggle sidebar expansion
@@ -61,13 +62,7 @@ const Sidebar = () => {
     <div className={`${isExpanded ? 'w-64' : 'w-20'} h-full bg-light-surface dark:bg-dark-surface flex flex-col border-r border-light-bg dark:border-dark-bg transition-all duration-300 overflow-y-auto pb-24`}>
       {/* Logo and Toggle */}
       <div className="p-6 flex items-center justify-between">
-        <h1 className="font-brand text-primary flex items-center">
-          {isExpanded ? (
-            <span className="text-2xl">Mousa</span>
-          ) : (
-            <span className="text-2xl">M</span>
-          )}
-        </h1>
+        <Logo collapsed={!isExpanded} />
         <button
           onClick={toggleSidebar}
           className="text-primary hover:bg-primary/10 rounded-full p-1 transition-colors"
@@ -97,10 +92,10 @@ const Sidebar = () => {
                   </Link>
                   {isExpanded && (
                     <button
-                      onClick={() => toggleSubItems('collection')}
+                      onClick={() => toggleSubItems(item.name.toLowerCase())}
                       className="p-3 text-light-text dark:text-dark-text hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
                     >
-                      {expandedItems.collection ? (
+                      {expandedItems[item.name.toLowerCase()] ? (
                         <HiChevronUp className="w-4 h-4" />
                       ) : (
                         <HiChevronDown className="w-4 h-4" />
@@ -120,7 +115,7 @@ const Sidebar = () => {
               )}
 
               {/* Sub-items */}
-              {isExpanded && item.subItems && expandedItems.collection && (
+              {isExpanded && item.subItems && expandedItems[item.name.toLowerCase()] && (
                 <ul className="pl-8 mt-1 space-y-1">
                   {item.subItems.map((subItem) => (
                     <li key={subItem.id}>

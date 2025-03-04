@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { MdPlaylistPlay, MdAlbum, MdMusicNote, MdDownload, MdStarBorder, MdHistory } from 'react-icons/md';
 import { FaLock } from 'react-icons/fa';
 import { RiVipCrownFill, RiHeartFill } from 'react-icons/ri';
+import CollectionCard from '../components/ui/CollectionCard';
+import CollectionItemCard from '../components/ui/CollectionItemCard';
 
 const CollectionPage = () => {
   // State for quick stats
@@ -45,12 +47,12 @@ const CollectionPage = () => {
 
   // Collection section items
   const collectionSections = [
-    { id: 'playlists', title: 'Playlists', icon: <MdPlaylistPlay className="w-6 h-6" />, path: '/collection/playlists', color: 'text-primary', bgColor: 'bg-primary/20', count: stats.playlists },
-    { id: 'liked', title: 'Liked Music', icon: <RiHeartFill className="w-6 h-6" />, path: '/collection/liked', color: 'text-red-500', bgColor: 'bg-red-500/20', count: stats.savedItems },
-    { id: 'purchased', title: 'Purchased', icon: <FaLock className="w-5 h-5" />, path: '/collection/purchased', color: 'text-gold', bgColor: 'bg-gold/20', count: stats.purchasedItems },
-    { id: 'downloads', title: 'Downloads', icon: <MdDownload className="w-6 h-6" />, path: '/collection/downloads', color: 'text-primary', bgColor: 'bg-primary/20', count: stats.downloads },
-    { id: 'exclusive', title: 'Exclusive Content', icon: <RiVipCrownFill className="w-5 h-5" />, path: '/collection/exclusive', color: 'text-gold', bgColor: 'bg-gold/20', count: stats.exclusiveContent },
-    { id: 'history', title: 'History', icon: <MdHistory className="w-6 h-6" />, path: '/collection/history', color: 'text-sage', bgColor: 'bg-sage/20', count: stats.historyItems },
+    { id: 'playlists', title: 'Playlists', icon: <MdPlaylistPlay className="w-6 h-6" />, path: '/collection/playlists', color: 'primary', bgColor: 'primary', count: stats.playlists },
+    { id: 'liked', title: 'Liked Music', icon: <RiHeartFill className="w-6 h-6" />, path: '/collection/liked', color: 'red', bgColor: 'red', count: stats.savedItems },
+    { id: 'purchased', title: 'Purchased', icon: <FaLock className="w-5 h-5" />, path: '/collection/purchased', color: 'gold', bgColor: 'gold', count: stats.purchasedItems },
+    { id: 'downloads', title: 'Downloads', icon: <MdDownload className="w-6 h-6" />, path: '/collection/downloads', color: 'primary', bgColor: 'primary', count: stats.downloads },
+    { id: 'exclusive', title: 'Exclusive Content', icon: <RiVipCrownFill className="w-5 h-5" />, path: '/collection/exclusive', color: 'gold', bgColor: 'gold', count: stats.exclusiveContent },
+    { id: 'history', title: 'History', icon: <MdHistory className="w-6 h-6" />, path: '/collection/history', color: 'sage', bgColor: 'sage', count: stats.historyItems },
   ];
 
   return (
@@ -61,15 +63,16 @@ const CollectionPage = () => {
       {/* Collection Sections */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
         {collectionSections.map(section => (
-          <Link to={section.path} key={section.id}>
-            <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer h-full">
-              <div className={`${section.bgColor} ${section.color} w-10 h-10 rounded-full flex items-center justify-center mb-3`}>
-                {section.icon}
-              </div>
-              <h3 className="font-semibold">{section.title}</h3>
-              <p className="text-light-text-secondary dark:text-dark-text-secondary text-sm">{section.count} items</p>
-            </div>
-          </Link>
+          <CollectionCard
+            key={section.id}
+            title={section.title}
+            count={section.count}
+            icon={section.icon}
+            color={section.color}
+            bgColor={section.bgColor}
+            path={section.path}
+            size="medium"
+          />
         ))}
       </div>
 
@@ -85,25 +88,20 @@ const CollectionPage = () => {
           </div>
           <div className="space-y-3">
             {recentItems.map(item => (
-              <div key={item.id} className="bg-light-surface dark:bg-dark-surface p-3 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer flex items-center">
-                <div className="w-12 h-12 rounded-md bg-teal/20 dark:bg-teal/30 flex items-center justify-center mr-3">
-                  {item.type === 'album' ? <MdAlbum className="text-teal" /> :
-                   item.type === 'track' ? <MdMusicNote className="text-teal" /> :
-                   <MdPlaylistPlay className="text-teal" />}
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">{item.title}</h3>
-                  <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">{item.artist}</p>
-                  <div className="flex mt-1 space-x-2 items-center">
-                    <span className="text-xs bg-teal/20 text-teal px-2 py-0.5 rounded-full">
-                      {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-                    </span>
-                    <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                      Added {item.addedDate}
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <CollectionItemCard
+                key={item.id}
+                title={item.title}
+                artist={item.artist}
+                type={item.type}
+                addedDate={item.addedDate}
+                icon={
+                  item.type === 'album' ? <MdAlbum size={22} /> :
+                  item.type === 'track' ? <MdMusicNote size={22} /> :
+                  <MdPlaylistPlay size={22} />
+                }
+                color="teal"
+                onClick={() => console.log(`Clicked on ${item.title}`)}
+              />
             ))}
           </div>
         </section>
@@ -123,8 +121,8 @@ const CollectionPage = () => {
                   <div className="flex items-start">
                     <div className="w-8 h-8 rounded-full bg-sage/20 dark:bg-sage/30 flex items-center justify-center mr-3 mt-1">
                       {activity.action.includes('playlist') ? <MdPlaylistPlay className="text-sage" /> :
-                       activity.action.includes('Purchased') ? <FaLock className="text-gold" /> :
-                       <MdDownload className="text-primary" />}
+                      activity.action.includes('Purchased') ? <FaLock className="text-gold" /> :
+                      <MdDownload className="text-primary" />}
                     </div>
                     <div>
                       <p className="text-sm">

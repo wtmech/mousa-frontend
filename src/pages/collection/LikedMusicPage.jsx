@@ -1,47 +1,76 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { RiHeartFill, RiPlayFill, RiAddLine, RiMoreLine } from 'react-icons/ri';
 import { MdMusicNote, MdAccessTime } from 'react-icons/md';
+import SectionTitle from '../../components/ui/SectionTitle';
+import PageTitle from '../../components/ui/PageTitle';
+import axios from 'axios';
 
 const LikedMusicPage = () => {
-  // State for liked tracks
+  // State for tracks from the liked playlist
   const [likedTracks, setLikedTracks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [sortOrder, setSortOrder] = useState('recent'); // 'recent', 'title', 'artist'
 
-  // Simulate fetching data
+  // Fetch liked music playlist
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call delay
-    setTimeout(() => {
-      // Mock data for liked tracks
-      setLikedTracks([
-        { id: 1, title: 'Higher Power', artist: 'Luna Ray', album: 'Dreamscape', duration: '3:45', dateAdded: '2023-06-10', coverImage: null },
-        { id: 2, title: 'Echo Chamber', artist: 'The Echomakers', album: 'Echo Chamber', duration: '4:12', dateAdded: '2023-06-08', coverImage: null },
-        { id: 3, title: 'Digital Dreams', artist: 'Pixel Pulse', album: 'Electronic Horizons', duration: '3:22', dateAdded: '2023-06-05', coverImage: null },
-        { id: 4, title: 'Neon Nights', artist: 'Synthwave Collective', album: 'Synthwave Anthology', duration: '5:17', dateAdded: '2023-05-28', coverImage: null },
-        { id: 5, title: 'Summer Anthem', artist: 'Beach Brigade', album: 'Summer Remix', duration: '3:55', dateAdded: '2023-05-20', coverImage: null },
-        { id: 6, title: 'Harmony', artist: 'Acoustic Assembly', album: 'Lost in Harmony', duration: '4:30', dateAdded: '2023-05-15', coverImage: null },
-        { id: 7, title: 'Midnight Drive', artist: 'Neon Nova', album: 'Night Lights', duration: '3:18', dateAdded: '2023-05-10', coverImage: null },
-        { id: 8, title: 'Ethereal', artist: 'Dream Weavers', album: 'Dreamscape', duration: '4:05', dateAdded: '2023-05-05', coverImage: null },
-        { id: 9, title: 'Resonance', artist: 'Luna Ray', album: 'Dreamscape', duration: '3:52', dateAdded: '2023-04-28', coverImage: null },
-        { id: 10, title: 'Cascade', artist: 'The Echomakers', album: 'Echo Chamber', duration: '3:40', dateAdded: '2023-04-20', coverImage: null },
-        { id: 11, title: 'Pixel Dreams', artist: 'Pixel Pulse', album: 'Electronic Horizons', duration: '4:15', dateAdded: '2023-04-15', coverImage: null },
-        { id: 12, title: 'Neon Sunset', artist: 'Synthwave Collective', album: 'Synthwave Anthology', duration: '3:35', dateAdded: '2023-04-10', coverImage: null },
-      ]);
-      setIsLoading(false);
-    }, 500);
+    const fetchLikedPlaylist = async () => {
+      try {
+        setIsLoading(true);
+        const token = localStorage.getItem('token');
+
+        // First, fetch the user's data to get the liked playlist ID
+        const userResponse = await axios.get('/api/auth/me', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+
+        if (!userResponse.data || !userResponse.data.playlists || !userResponse.data.playlists.liked) {
+          throw new Error('Liked playlist not found');
+        }
+
+        const likedPlaylistId = userResponse.data.playlists.liked;
+
+        // Then fetch the playlist details
+        const playlistResponse = await axios.get(`/api/playlists/${likedPlaylistId}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+
+        // Extract and format tracks from the playlist
+        const tracks = playlistResponse.data.tracks.map(item => ({
+          ...item.track,
+          dateAdded: item.addedAt
+        }));
+
+        setLikedTracks(tracks || []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching liked playlist:', err);
+        setError('Failed to load your liked music. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLikedPlaylist();
   }, []);
 
   // Sorting function
   const getSortedTracks = () => {
+    if (!likedTracks.length) return [];
+
     switch (sortOrder) {
       case 'title':
         return [...likedTracks].sort((a, b) => a.title.localeCompare(b.title));
       case 'artist':
-        return [...likedTracks].sort((a, b) => a.artist.localeCompare(b.artist));
+        return [...likedTracks].sort((a, b) =>
+          (a.artist?.name || 'Unknown').localeCompare(b.artist?.name || 'Unknown')
+        );
       case 'recent':
       default:
-        return [...likedTracks].sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+        return [...likedTracks].sort((a, b) =>
+          new Date(b.dateAdded || b.createdAt) - new Date(a.dateAdded || a.createdAt)
+        );
     }
   };
 
@@ -51,15 +80,15 @@ const LikedMusicPage = () => {
     // Implementation would trigger the music player to play all tracks
   };
 
+  const sortedTracks = getSortedTracks();
+
   return (
     <div className="pb-24 pt-2">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold flex items-center">
-            <RiHeartFill className="text-red-500 mr-3" /> Liked Music
-          </h1>
+          <PageTitle>Liked Music</PageTitle>
           <p className="text-light-text-secondary dark:text-dark-text-secondary mt-1">
-            {likedTracks.length} tracks you've liked
+            {likedTracks.length} {likedTracks.length === 1 ? 'track' : 'tracks'} you've liked
           </p>
         </div>
 
@@ -67,6 +96,7 @@ const LikedMusicPage = () => {
           <button
             onClick={playAllTracks}
             className="bg-primary hover:bg-primary/90 text-white py-2 px-4 rounded-full flex items-center mr-4"
+            disabled={!likedTracks.length}
           >
             <RiPlayFill className="mr-1" /> Play All
           </button>
@@ -87,6 +117,17 @@ const LikedMusicPage = () => {
         <div className="flex justify-center my-12">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent"></div>
         </div>
+      ) : error ? (
+        <div className="bg-red-500/10 text-red-500 p-4 mb-6 rounded-md">
+          {error}
+        </div>
+      ) : likedTracks.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-xl">You haven't liked any tracks yet.</p>
+          <p className="mt-2 text-light-text-secondary dark:text-dark-text-secondary">
+            Browse the library and click the heart icon to add tracks to your liked music.
+          </p>
+        </div>
       ) : (
         <div className="bg-light-surface dark:bg-dark-surface rounded-lg overflow-hidden">
           {/* Tracks table header */}
@@ -100,9 +141,9 @@ const LikedMusicPage = () => {
 
           {/* Tracks list */}
           <div className="divide-y divide-light-bg dark:divide-dark-bg">
-            {getSortedTracks().map((track, index) => (
+            {sortedTracks.map((track, index) => (
               <div
-                key={track.id}
+                key={track._id || track.id}
                 className="grid grid-cols-12 gap-2 p-3 items-center hover:bg-light-bg dark:hover:bg-dark-bg transition-colors group"
               >
                 <div className="col-span-1 text-light-text-secondary dark:text-dark-text-secondary flex items-center">
@@ -111,19 +152,36 @@ const LikedMusicPage = () => {
                 </div>
                 <div className="col-span-4 flex items-center">
                   <div className="w-10 h-10 bg-primary/20 rounded flex items-center justify-center mr-3">
-                    <MdMusicNote className="text-primary" />
+                    {track.coverArt ? (
+                      <img src={track.coverArt} alt={track.title} className="w-full h-full object-cover rounded" />
+                    ) : (
+                      <MdMusicNote className="text-primary" />
+                    )}
                   </div>
                   <div className="truncate">
                     <div className="font-medium truncate">{track.title}</div>
                     <div className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                      Added {track.dateAdded}
+                      Added {new Date(track.dateAdded || track.createdAt).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
-                <div className="col-span-3 truncate">{track.artist}</div>
-                <div className="col-span-3 truncate">{track.album}</div>
+                <div className="col-span-3 truncate">
+                  <Link
+                    to={`/artists/${track.artist?._id || track.artistId}`}
+                    className="hover:text-teal transition-colors"
+                  >
+                    {track.artist?.name || track.artist || 'Unknown Artist'}
+                  </Link>
+                </div>
+                <div className="col-span-3 truncate">
+                  {track.album?.title || track.album || 'Unknown Album'}
+                </div>
                 <div className="col-span-1 flex justify-end items-center">
-                  <span className="text-light-text-secondary dark:text-dark-text-secondary mr-3">{track.duration}</span>
+                  <span className="text-light-text-secondary dark:text-dark-text-secondary mr-3">
+                    {track.duration ?
+                      `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}` :
+                      '0:00'}
+                  </span>
                   <div className="relative group">
                     <button className="opacity-0 group-hover:opacity-100 transition-opacity text-light-text-secondary dark:text-dark-text-secondary hover:text-primary">
                       <RiMoreLine />

@@ -4,18 +4,21 @@ import { FiUser, FiChevronDown, FiChevronUp, FiSettings, FiLogOut, FiCreditCard 
 import { HiSun, HiMoon } from 'react-icons/hi';
 import { useTheme } from '../../context/ThemeContext';
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const TopBar = () => {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const userMenuRef = useRef(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-  // Close the menu when clicking outside
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
-        setUserMenuOpen(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
       }
     };
 
@@ -23,13 +26,12 @@ const TopBar = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [userMenuRef]);
+  }, []);
 
   // Handle logout
   const handleLogout = () => {
-    console.log('User logged out');
-    // Implementation would handle actual logout logic
-    setUserMenuOpen(false);
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -80,54 +82,50 @@ const TopBar = () => {
         </button>
 
         {/* User Menu */}
-        <div className="relative" ref={userMenuRef}>
+        <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className="flex items-center space-x-2 p-1 rounded-full hover:bg-primary/10 dark:hover:bg-primary/20"
+            className="flex items-center space-x-2 rounded-full bg-secondary/50 px-3 py-1.5 hover:bg-secondary/80"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
           >
-            <div className="w-8 h-8 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center">
-              <FiUser className="w-4 h-4 text-primary" />
+            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+              {user?.username?.charAt(0) || 'U'}
             </div>
-            <span className="font-medium">User</span>
-            {userMenuOpen ? (
-              <FiChevronUp className="w-4 h-4" />
-            ) : (
-              <FiChevronDown className="w-4 h-4" />
-            )}
+            <span className="font-medium">{user?.username || 'User'}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
           </button>
 
-          {/* Dropdown Menu */}
-          {userMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-light-surface dark:bg-dark-surface rounded-md shadow-lg py-1 z-50 border border-light-bg dark:border-dark-bg">
-              <div className="px-4 py-3 border-b border-light-bg dark:border-dark-bg">
-                <p className="text-sm leading-5 font-medium">Billy Smith</p>
-                <p className="text-xs leading-4 text-light-text-secondary dark:text-dark-text-secondary truncate">billy.smith@example.com</p>
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 rounded-md bg-background shadow-lg border border-border z-10">
+              <div className="px-4 py-3 border-b border-border">
+                <p className="text-sm font-medium">{user?.username || 'User'}</p>
+                <p className="text-xs text-muted-foreground">{user?.email || 'user@example.com'}</p>
               </div>
-              <a
-                href="/profile"
-                className="block px-4 py-2 text-sm text-light-text dark:text-dark-text hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
-              >
-                <FiUser className="inline mr-2" /> Profile
-              </a>
-              <a
-                href="/settings"
-                className="block px-4 py-2 text-sm text-light-text dark:text-dark-text hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
-              >
-                <FiSettings className="inline mr-2" /> Settings
-              </a>
-              <a
-                href="/account"
-                className="block px-4 py-2 text-sm text-light-text dark:text-dark-text hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
-              >
-                <FiCreditCard className="inline mr-2" /> Account Management
-              </a>
-              <div className="border-t border-light-bg dark:border-dark-bg my-1"></div>
-              <button
-                onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
-              >
-                <FiLogOut className="inline mr-2" /> Logout
-              </button>
+              <div className="py-1">
+                <Link
+                  to="/settings"
+                  className="block px-4 py-2 text-sm hover:bg-secondary/50"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Settings
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-500/10"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           )}
         </div>

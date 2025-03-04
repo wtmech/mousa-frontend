@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { MdMusicNote, MdFilterList } from 'react-icons/md';
 import { RiVipCrownFill } from 'react-icons/ri';
 import { FaClock } from 'react-icons/fa';
-
+import PageTitle from '../../components/ui/PageTitle';
 const ExclusiveContentPage = () => {
   // State for exclusive content and filters
   const [exclusiveContent, setExclusiveContent] = useState([]);
@@ -44,7 +44,7 @@ const ExclusiveContentPage = () => {
 
   return (
     <div className="pb-24 pt-2">
-      <h1 className="text-3xl font-bold mb-2">Exclusive Content</h1>
+      <PageTitle>Exclusive Content</PageTitle>
       <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
         Special content from artists you support
       </p>

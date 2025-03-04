@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { FaGuitar, FaRegCalendarAlt, FaUsers, FaCommentAlt, FaStar } from 'react-icons/fa';
 import { MdVerified, MdOutlineRecommend, MdCampaign } from 'react-icons/md';
 import { RiVipCrownLine, RiVipCrownFill } from 'react-icons/ri';
@@ -136,7 +137,11 @@ const ArtistHubPage = () => {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {supportedArtists.map(artist => (
-            <div key={artist.id} className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer relative">
+            <Link
+              key={artist.id}
+              to={`/artists/${artist.id}`}
+              className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer relative"
+            >
               <div className="absolute top-3 right-3">
                 <RiVipCrownFill className={`w-5 h-5 ${
                   artist.badgeColor === 'gold' ? 'text-gold' :
@@ -150,7 +155,7 @@ const ArtistHubPage = () => {
               <h3 className="font-semibold text-center">{artist.name}</h3>
               <p className="text-xs text-center text-light-text-secondary dark:text-dark-text-secondary mb-2">{artist.supportTier}</p>
               <p className="text-sm font-semibold text-center text-primary">${artist.monthlyAmount}/month</p>
-            </div>
+            </Link>
           ))}
         </div>
       </section>

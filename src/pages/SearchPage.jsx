@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
+import { Link } from 'react-router-dom';
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,7 +54,7 @@ const SearchPage = () => {
   };
 
   // React to debounced query changes
-  useState(() => {
+  useEffect(() => {
     if (debouncedQuery) {
       handleSearch(debouncedQuery);
     }
@@ -126,7 +127,14 @@ const SearchPage = () => {
                           <tr key={track.id} className="hover:bg-foreground/5 cursor-pointer">
                             <td className="px-4 py-3">{index + 1}</td>
                             <td className="px-4 py-3 font-medium">{track.title}</td>
-                            <td className="px-4 py-3 text-muted-foreground">{track.artist}</td>
+                            <td className="px-4 py-3 text-muted-foreground">
+                              <Link
+                                to={`/artists/${track.artistId}`}
+                                className="hover:text-teal transition-colors"
+                              >
+                                {track.artist}
+                              </Link>
+                            </td>
                             <td className="px-4 py-3 text-muted-foreground">{track.duration}</td>
                           </tr>
                         ))}
@@ -143,11 +151,13 @@ const SearchPage = () => {
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {searchResults.artists.map((artist) => (
                       <div key={artist.id} className="bg-secondary hover:bg-secondary/80 rounded-lg p-4 text-center transition-colors cursor-pointer">
-                        <div className="w-24 h-24 mx-auto rounded-full bg-foreground/10 flex items-center justify-center mb-3">
-                          <span className="text-3xl">👤</span>
-                        </div>
-                        <h3 className="font-medium">{artist.name}</h3>
-                        <p className="text-sm text-muted-foreground">{artist.followers} followers</p>
+                        <Link to={`/artists/${artist.id}`} className="block">
+                          <div className="w-24 h-24 mx-auto rounded-full bg-foreground/10 flex items-center justify-center mb-3">
+                            <span className="text-3xl">👤</span>
+                          </div>
+                          <h3 className="font-medium">{artist.name}</h3>
+                          <p className="text-sm text-muted-foreground">{artist.followers} followers</p>
+                        </Link>
                       </div>
                     ))}
                   </div>
@@ -165,7 +175,14 @@ const SearchPage = () => {
                           <span className="text-2xl text-muted-foreground">💿</span>
                         </div>
                         <h3 className="font-medium truncate">{album.title}</h3>
-                        <p className="text-sm text-muted-foreground truncate">{album.artist} • {album.year}</p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          <Link
+                            to={`/artists/${album.artistId}`}
+                            className="hover:text-teal transition-colors"
+                          >
+                            {album.artist}
+                          </Link> • {album.year}
+                        </p>
                       </div>
                     ))}
                   </div>

@@ -1,0 +1,10 @@
+/* Logo specific styles */
+.mousa-logo {
+  font-family: 'Calistoga', cursive !important;
+  font-weight: normal;
+}
+
+/* Apply a slight text shadow to make it stand out more */
+.mousa-logo {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}

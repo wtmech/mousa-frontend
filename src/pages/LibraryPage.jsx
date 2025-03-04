@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { HiUser, HiCreditCard, HiBell, HiCog, HiClipboardList, HiShare, HiUserGroup } from 'react-icons/hi';
 import { FaGuitar, FaMusic, FaMoneyBillWave, FaRegCreditCard, FaHistory, FaEnvelope } from 'react-icons/fa';
 import { MdPrivacyTip, MdNotificationsActive, MdTune, MdOutlinePlaylistAdd } from 'react-icons/md';
@@ -103,28 +104,36 @@ const LibraryPage = () => {
           <h3 className="text-sm font-medium mb-2 text-light-text-secondary dark:text-dark-text-secondary">SUPPORTED ARTISTS</h3>
           <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-3 mb-6">
             {followedArtists.filter(a => a.isSupported).map(artist => (
-              <div key={artist.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer">
+              <Link
+                key={artist.id}
+                to={`/artists/${artist.id}`}
+                className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer"
+              >
                 <div className="w-full aspect-square bg-primary/20 dark:bg-primary/30 rounded-full flex items-center justify-center mb-2">
                   <FaGuitar className="w-6 h-6 text-primary opacity-70" />
                 </div>
                 <h3 className="font-semibold text-center text-sm truncate">{artist.name}</h3>
                 <p className="text-xs text-center text-gold truncate">{artist.tier}</p>
-              </div>
+              </Link>
             ))}
           </div>
 
           <h3 className="text-sm font-medium mb-2 text-light-text-secondary dark:text-dark-text-secondary">OTHER FOLLOWED ARTISTS</h3>
           <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-3">
             {followedArtists.filter(a => !a.isSupported).map(artist => (
-              <div key={artist.id} className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer">
+              <Link
+                key={artist.id}
+                to={`/artists/${artist.id}`}
+                className="bg-light-surface dark:bg-dark-surface p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition cursor-pointer"
+              >
                 <div className="w-full aspect-square bg-light-bg dark:bg-dark-bg rounded-full flex items-center justify-center mb-2">
                   <FaGuitar className="w-6 h-6 text-light-text-secondary dark:text-dark-text-secondary opacity-70" />
                 </div>
                 <h3 className="font-semibold text-center text-sm truncate">{artist.name}</h3>
-                <button className="w-full mt-1 text-xs py-0.5 bg-primary hover:bg-primary-hover text-white rounded-full transition">
-                  Support
-                </button>
-              </div>
+                <p className="text-xs text-center text-light-text-secondary dark:text-dark-text-secondary truncate">
+                  {artist.followedSince}
+                </p>
+              </Link>
             ))}
           </div>
         </div>

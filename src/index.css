@@ -49,12 +49,27 @@
   }
 
   body {
-    @apply bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text;
+    @apply bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* Only apply brand font to headings and logo */
   h1, h2, h3, h4, h5, h6 {
     @apply font-brand;
+  }
+
+  /* Logo should always use brand font - more specific CSS rules */
+  .logo {
+    font-family: 'Calistoga', cursive !important;
+  }
+
+  .font-brand {
+    font-family: 'Calistoga', cursive !important;
+  }
+
+  /* Apply sans-serif to all paragraph text */
+  p, span, div, button, a, input, textarea, select, label {
+    @apply font-sans;
   }
 
   /* Custom scrollbar styling */
